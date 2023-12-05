@@ -1,0 +1,83 @@
+[gd_scene load_steps=14 format=3 uid="uid://b7aw8jrxnp6dq"]
+
+[ext_resource type="Script" path="res://grass_field/grass_field.gd" id="1_jw50d"]
+[ext_resource type="Shader" path="res://grass_field/grass_field.gdshader" id="2_no2y3"]
+[ext_resource type="Script" path="res://shared/player_controller.gd" id="3_6fm1c"]
+[ext_resource type="PackedScene" path="res://shared/models/sophia/sophia_skin.tscn" id="3_b1w56"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7pet2"]
+size = Vector3(10, 0, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6jnk6"]
+albedo_color = Color(0.643137, 0.752941, 0.556863, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_184lg"]
+size = Vector2(10, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pju08"]
+size = Vector3(10, 0, 10)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_q0w3g"]
+render_priority = 0
+shader = ExtResource("2_no2y3")
+shader_parameter/effect_texture_size = null
+
+[sub_resource type="MultiMesh" id="MultiMesh_ps1vk"]
+transform_format = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ckitj"]
+size = Vector3(10, 1, 10)
+
+[sub_resource type="Environment" id="Environment_ehcsc"]
+ssao_enabled = true
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_c0kxw"]
+radius = 0.3
+height = 1.0
+
+[node name="GrassField" type="Node3D"]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("BoxShape3D_7pet2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]
+material_override = SubResource("StandardMaterial3D_6jnk6")
+mesh = SubResource("PlaneMesh_184lg")
+
+[node name="GrassField" type="Area3D" parent="StaticBody3D"]
+script = ExtResource("1_jw50d")
+shape = SubResource("BoxShape3D_pju08")
+
+[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="StaticBody3D/GrassField"]
+material_override = SubResource("ShaderMaterial_q0w3g")
+multimesh = SubResource("MultiMesh_ps1vk")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D/GrassField"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("BoxShape3D_ckitj")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.812633, 0.582775, 0, -0.582775, 0.812633, 0, 2.24294, 5.86341)
+fov = 60.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.343643, 0.9391, 0, -0.9391, 0.343643, 0, 2.39433, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ehcsc")
+
+[node name="Player" type="CharacterBody3D" parent="."]
+script = ExtResource("3_6fm1c")
+move_speed = 3.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("CapsuleShape3D_c0kxw")
+
+[node name="RotationRoot" type="Node3D" parent="Player"]
+
+[node name="CharacterSkin" parent="Player/RotationRoot" instance=ExtResource("3_b1w56")]
+
+[node name="GroundRayCast" type="RayCast3D" parent="Player"]
